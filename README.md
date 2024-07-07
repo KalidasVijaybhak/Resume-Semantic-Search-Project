@@ -1,4 +1,5 @@
 # Semantic Search for Resumes
+![image](https://github.com/KalidasVijaybhak/Resume-Semantic-Search-Project/assets/70281178/c9485aa1-9c45-408c-bb2c-408d9792e445)
 
 ## Project Overview
 This project enables semantic search over a dataset of resumes in PDF format. It allows users to search for resumes based on queries and ranks them according to relevance.
@@ -29,4 +30,8 @@ This project enables semantic search over a dataset of resumes in PDF format. It
      python semantic_search_with_api.py
      ```
    - This will start the FastAPI server for API-based semantic search.
+
+## Demo
+
+https://github.com/KalidasVijaybhak/Resume-Semantic-Search-Project/assets/70281178/bdd446b9-7cb6-47dd-aaea-ec50e50fcfab
 

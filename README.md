@@ -30,8 +30,3 @@ This project enables semantic search over a dataset of resumes in PDF format. It
      ```
    - This will start the FastAPI server for API-based semantic search.
 
-## Notes
-- Ensure Python and necessary dependencies are installed as per `requirements.txt`.
-- For detailed setup and usage instructions, refer to the respective README files in relevant folders.
-
-Feel free to reach out for any questions or support!

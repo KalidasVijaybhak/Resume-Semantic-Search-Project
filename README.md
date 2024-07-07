@@ -2,9 +2,6 @@
 
 https://github.com/KalidasVijaybhak/Resume-Semantic-Search-Project/assets/70281178/bdd446b9-7cb6-47dd-aaea-ec50e50fcfab
 
-## Project Overview
-This project enables semantic search over a dataset of resumes in PDF format. It allows users to search for resumes based on queries and ranks them according to relevance.
-
 ## Instructions
 
 ### Setting Up the Dataset

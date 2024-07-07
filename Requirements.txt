@@ -1,0 +1,17 @@
+numpy
+transformers
+sentence-transformers
+pydantic
+faiss-cpu
+cohere
+langchain
+langchain-community
+pypdf
+langchain-cohere
+google-generativeai
+fastapi
+streamlit
+webbrowser
+json
+pydantic
+uvicorn

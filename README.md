@@ -1,6 +1,10 @@
 # Semantic Search for Resumes
 
-https://github.com/KalidasVijaybhak/Resume-Semantic-Search-Project/assets/70281178/bdd446b9-7cb6-47dd-aaea-ec50e50fcfab
+
+
+https://github.com/KalidasVijaybhak/Resume-Semantic-Search-Project/assets/70281178/eda88bc6-795f-4166-91e6-3b42f89ece02
+
+
 
 ## Instructions
 

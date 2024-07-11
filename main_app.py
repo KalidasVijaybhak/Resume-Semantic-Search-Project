@@ -1,6 +1,10 @@
 import streamlit as st
 import re
+import ast
 import os
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
 import numpy as np
 import webbrowser  # For opening in default PDF viewer
 from response import Analyst
@@ -12,6 +16,8 @@ if 'search_results' not in st.session_state:
     st.session_state.search_results = None
 if 'edit_inputs' not in st.session_state:
     st.session_state.edit_inputs = {}
+if 'search' not in st.session_state:
+    st.session_state.search = ""
 st.markdown("""
             <style>
                 div[data-testid="column"] {
@@ -36,38 +42,90 @@ loaded_dict = dict(pdf_contents)
 
 # print(loaded_dict['21dcs013@charusat.edu.in_resume.pdf'])
 
-def open_pdf(directory, filename):
+# Ensure you have the necessary NLTK resources
+# nltk.download('stopwords')
+# nltk.download('punkt')
+
+def preprocess_query(query):
     """
-    Opens a PDF file from the specified directory using the user's default PDF viewer.
+    Preprocess the query by removing stopwords.
+
+    Args:
+        query (str): The query text to preprocess.
+
+    Returns:
+        str: The preprocessed query.
+    """
+    with st.spinner('load'):
+        st.session_state.search = analyst.generate_list(query)
+        print(st.session_state.search)
+    
+    # stop_words = set(stopwords.words('english'))
+    # word_tokens = word_tokenize(query)
+    # filtered_query = [word for word in word_tokens if word.lower() not in stop_words]
+    my_list = ast.literal_eval(st.session_state.search)
+    print(my_list)
+    return my_list
+
+import os
+import webbrowser
+import pymupdf  # PyMuPDF
+
+def open_pdf(directory, filename, query):
+    """
+    Opens a PDF file from the specified directory, highlights the query text, and saves a new PDF file with the highlighted text.
 
     Args:
         directory (str): The path to the directory containing the PDF file.
         filename (str): The name of the PDF file to open.
+        query (str): The text to search for and highlight in the PDF file.
 
     Returns:
         None
     """
-
+    preprocessed_query = preprocess_query(query)
     # Construct the complete file path
     full_path = os.path.join(directory, filename)
-
+    new_filename = f"highlighted_{filename}"
+    new_full_path = os.path.join(directory, new_filename)
+    
     # Check if the file exists
     if not os.path.isfile(full_path):
         print(f"Error: File '{filename}' not found in directory '{directory}'.")
         return
 
-    # Open the PDF using the default PDF viewer
     try:
-        webbrowser.open(full_path)
-    except webbrowser.exceptions.OSError:
-        print("Error: Could not open PDF using the default viewer. "
-            "Please ensure you have a PDF viewer installed.")
+        # Open the PDF using PyMuPDF
+        doc=pymupdf.open(full_path)
+        print(preprocessed_query)
+        # Search and highlight the query text
+        for page_num in range(len(doc)):
+            page = doc.load_page(page_num)
+            
+            # Loop through each search text
+            for search_text in preprocessed_query:
+                text_instances = page.search_for(search_text)
+                
+                for inst in text_instances:
+                    # Define the highlight
+                    highlight = page.add_highlight_annot(inst)
+                    highlight.update()
+                # Save the new PDF with highlighted text
+                doc.save(new_full_path)
+
+        # Open the new PDF using the default PDF viewer
+        webbrowser.open(new_full_path)
+        print(f"Highlighted PDF saved as '{new_filename}' and opened successfully.")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
     
 # Example usage
 
 
-def result(str):
-    response = analyst.generate_response(str)
+def result(str,query):
+    response = analyst.generate_response(str,query)
     return response
 
 def send_query(query_text):
@@ -81,7 +139,7 @@ def send_query(query_text):
         if response.status_code == 200:
             data = response.json()
             st.session_state.search_results = data['metadata']
-            display_results()
+            display_results(query_text)
         else:
             st.error(f"Error: Received status code {response.status_code}")
             st.text(response.text)
@@ -93,7 +151,7 @@ def send_query(query_text):
     except KeyError:
         st.error("The response doesn't contain the expected 'metadata' key")
 
-def display_results():
+def display_results(query):
     pdf_directory = os.path.join(os.path.dirname(__file__), 'resume_dataset')
     if st.session_state.search_results:
         st.subheader("Search Results")
@@ -120,15 +178,15 @@ def display_results():
                     c_edit_button = st.button('Generate Report', key=edit_button_key)
                     if c_edit_button:
                         with st.spinner('Loading'):
-                            st.write(result(st.session_state.edit_inputs[i]))
+                            st.write(result(st.session_state.edit_inputs[i],query))
                             
                     # st.write(source)
                 with col2:
                     open_button_key = f"open_{i}"
                     open_button = st.button('Open Resume', key=open_button_key)
                     if open_button:
-                        with st.spinner('Loading'):
-                            open_pdf(pdf_directory, filename_pdf)
+                        
+                        open_pdf(pdf_directory, filename_pdf,query)
                             
                 st.code(filename_pdf)
 
@@ -145,7 +203,7 @@ def main():
     # Display results if they exist in session state
     try: 
         if st.session_state.search_results:
-            display_results()
+            display_results(query)
     except:
         "End"
 
